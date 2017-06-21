@@ -215,10 +215,12 @@ export default class Container extends React.Component {
         let submit_button_text = "Submit"
         let disabled_class = ""
         let disabled_prop = {}
+        let loadingSpinner = ""
         if(this.state.submitting){
-            submit_button_text = "Submitting "+<Icon spin name="spinner"/>;
+            submit_button_text = "Submitting "
             disabled_class = "disabled"
             disabled_prop = {'disabled':true}
+            loadingSpinner = <Icon spin name="spinner"/>
         }
 
         if(this.state.submitted){
@@ -228,7 +230,7 @@ export default class Container extends React.Component {
         }
 
         let submit_button = (<button className={"btn btn-primary submit-button "+disabled_class} 
-                                    onClick={this.handleSubmitButtonClick} {...disabled_prop}>{submit_button_text}</button>)
+                                    onClick={this.handleSubmitButtonClick} {...disabled_prop}>{submit_button_text}{loadingSpinner}</button>)
 
 
         return (
