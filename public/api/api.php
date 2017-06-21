@@ -60,6 +60,24 @@ class MyApi
 			case "hello":
 				$this->hello($this->request->data);
 				break;
+			case "getUserState":
+				error_log("getUserState has been sent through");
+				$data = json_decode($this->request->data);
+				$this->getUserState($data->lti_id, $data->user_id);
+				break;
+			case "setUserState":
+				error_log("setUserState has been sent through");
+				$request = $this->request;
+
+
+				$newState = json_decode($request->app_state, true);
+				$newState["submitted"] = true;
+				$this->setUserState($request->lti_id, $request->user_id, $newState);
+
+				send_grade(1, $this->config, $request->lti_grade_url, $request->result_sourcedid, $request->lti_consumer_key);
+				$this->reply($newState,200);
+
+				break;	
 			default:
 				$this->reply("action switch failed",400);
 			break;
@@ -73,6 +91,68 @@ class MyApi
 		$data = json_decode($this->request->data);
 		$this->reply("Hello ".$data->name.", I'm PHP :)");
 	}
+
+	public function setUserState($lti_id, $user_id, $state){
+		$state = json_encode($state);
+        date_default_timezone_set('Australia/Brisbane');
+        $modified = date('Y-m-d H:i:s');
+		if(!$this->checkTableExists("states")){
+			$this->db->raw("CREATE TABLE states (
+				id INT(11) UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
+				user_id TEXT NOT NULL,
+				lti_id TEXT NOT NULL,
+				state MEDIUMTEXT,
+				created DATETIME DEFAULT NULL,
+				updated DATETIME DEFAULT NULL
+			)");
+		}
+		$existing = $this->checkStateExists($lti_id, $user_id);
+		if(!$existing) {
+			$this->db->create('states', array('lti_id'=>$lti_id,'user_id'=>$user_id, 'state'=>$state,'created'=>$modified,'updated'=>$modified));
+		} else {
+			$this->db->query('UPDATE states SET state = :state WHERE lti_id = :lti_id AND user_id = :user_id', array( 'state' => $state, 'lti_id' => $lti_id, 'user_id' => $user_id ) );
+		}
+    }
+
+	public function getUserState($lti_id, $user_id){
+		
+		if(!$this->checkTableExists("states")){
+			//$this->reply("Table 'states' for user:".$user_id." in lti:".$lti_id." not found", 404);
+			$this->db->raw("CREATE TABLE states (
+				id INT(11) UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
+				user_id TEXT NOT NULL,
+				lti_id TEXT NOT NULL,
+				state MEDIUMTEXT,
+				created DATETIME DEFAULT NULL,
+				updated DATETIME DEFAULT NULL
+			)");
+		}
+        $select = $this->db->query( 'SELECT state FROM states WHERE lti_id = :lti_id AND user_id = :user_id', array( 'lti_id' => $lti_id, 'user_id' => $user_id ) );
+        while ( $row = $select->fetch() ) {
+           $this->reply($row);
+        }
+        $this->reply("State in table 'states' for user:".$user_id." in lti:".$lti_id." not found",404);
+    }
+
+	private function checkTableExists($tableName){
+		$select = $this->db->query("SELECT * 
+			FROM information_schema.tables
+			WHERE table_schema = :dbname 
+				AND table_name = :tablename
+			LIMIT 1", array("dbname"=>$this->config["db"]["dbname"], "tablename"=>$tableName));
+		if($select->fetch()){
+			return true;
+		}
+		return false;
+	}
+	private function checkStateExists($lti_id, $user_id){
+        $select = $this->db->query( 'SELECT state FROM states WHERE lti_id = :lti_id AND user_id = :user_id', array( 'lti_id' => $lti_id, 'user_id' => $user_id ) );
+        while ( $row = $select->fetch() ) {
+		   return true;
+        }
+		return false;
+	}
+
 
 	/**
 	 * Prevent unauthenticated access to the backend
@@ -129,6 +209,8 @@ class MyApi
 
 require_once('../lib/db.php');
 require_once('../config.php');
+require_once('../lib/OAuth.php');
+require_once('../lib/grade.php');
 
 if(isset($config['use_db']) && $config['use_db']) {
 	Db::config( 'driver',   'mysql' );
@@ -138,6 +220,6 @@ if(isset($config['use_db']) && $config['use_db']) {
 	Db::config( 'password', $config['db']['password'] );
 }
 
-$db = null; //Db::instance(); //uncomment and enter db details in config to use database
+$db = Db::instance(); //uncomment and enter db details in config to use database
 $MyApi = new MyApi($db, $config);
 

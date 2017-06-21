@@ -127,6 +127,13 @@ class Lti {
 		return 'Unknown resource link id (lti id)';
 	}
 
+	function lti_consumer_key(){
+		if(isset($this->ltivars["oauth_consumer_key"])) {
+			return $this->ltivars["oauth_consumer_key"];
+		}
+		return 'Unknown oauth consumer key';
+	}
+
 	function requirevalid() {
 		if($this->valid) {
 			return;

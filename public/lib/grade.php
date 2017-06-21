@@ -1,12 +1,10 @@
 <?php
 
-	function send_grade($grade,$lti){
+	function send_grade($grade, $config, $lti_grade_url, $sourcedid, $lti_consumer_key){
 		$method="POST";
-		$sourcedid = $lti->result_sourcedid();
 		if (get_magic_quotes_gpc()) $sourcedid = stripslashes($sourcedid);
-		$oauth_consumer_key = $lti->lti_id();
-		$oauth_consumer_secret = '123456';
-		$endpoint = $lti->grade_url();
+		$oauth_consumer_key = $lti_consumer_key;
+		$oauth_consumer_secret = $config['lti_keys'][$lti_consumer_key];
 		$content_type = "application/xml";
 		$operation = 'replaceResultRequest';
 		$messageIdent = $_SERVER['REQUEST_TIME'];
@@ -39,7 +37,7 @@
 		$token = '';
 		$hmac_method = new OAuthSignatureMethod_HMAC_SHA1();
 		$consumer = new OAuthConsumer($oauth_consumer_key, $oauth_consumer_secret);
-		$outcome_request = OAuthRequest::from_consumer_and_token($consumer, $token, $method, $endpoint, $params);
+		$outcome_request = OAuthRequest::from_consumer_and_token($consumer, $token, $method, $lti_grade_url, $params);
 		//return $outcome_request;
 		$outcome_request->sign_request($hmac_method, $consumer, $token);
 		$header = $outcome_request->to_header();
@@ -52,7 +50,7 @@
 			),
 		);
 		$ctx = stream_context_create($options);
-		$fp = @fopen($endpoint, 'rb', FALSE, $ctx);
+		$fp = @fopen($lti_grade_url, 'rb', FALSE, $ctx);
 		$response = @stream_get_contents($fp);
 		return $response;
 	}

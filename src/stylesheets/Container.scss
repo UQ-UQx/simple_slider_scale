@@ -4,13 +4,7 @@
 .container-component{
     width: 100%;
     text-align: center;
-   
-    h1{
-        margin:0;
-        margin-bottom: 10px;
-        padding:10px;
-        @include MainTitleStyle()
-    }
+    padding:10px;
 
 }
 
@@ -20,4 +14,22 @@
 
 .valid-lti-span{
     color:$valid
+}
+
+.question-container{
+    
+    h3{
+        margin:0;
+        margin-bottom: 20px;
+        padding:10px;
+        border-bottom: 1px solid black;
+        color:white;
+        background-color: grey;
+    }
+    border:1px solid black;
+    margin-bottom:15px;
+}
+
+.submit-button{
+    float:left !important;
 }
