@@ -194,6 +194,10 @@ export default class Container extends React.Component {
             </pre>
         </div>)
 
+        if($LTI_user_role != "Instructor"){
+            calldata = "";
+        }
+
         const questions = this.structure.map(question=>{
            const sliders = question.sliders.map(slider=>{
 
