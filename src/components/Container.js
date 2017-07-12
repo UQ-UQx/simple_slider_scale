@@ -186,17 +186,20 @@ export default class Container extends React.Component {
     render(){
 
 
-        let calldata = (<div className="call-data-container">
-            <hr/>
-            <h3>Following is visible to instructors only</h3>
-            <pre>
-                {JSON.stringify($LTI_call_data)}
-            </pre>
-        </div>)
 
-        if(($LTI_user_role !== "Instructor") || ($LTI_user_role !== "Administrator")){
-            calldata = "";
+        let calldata = "";
+
+        if(($LTI_user_role === "Instructor") || ($LTI_user_role === "Administrator")){
+            calldata = (<div className="call-data-container">
+                        <hr/>
+                        <h3>Following is visible to instructors only</h3>
+                        <pre>
+                            {JSON.stringify($LTI_call_data)}
+                        </pre>
+                    </div>);
         }
+
+        
 
         const questions = this.structure.map(question=>{
            const sliders = question.sliders.map(slider=>{

@@ -23,14 +23,14 @@
 
             $lti_id = $lti->lti_id();
 			$user_id = $lti->user_id();
-			$calldata = $lti->calldata();
+			$calldata = "";
 			$lti_grade_url = $lti->grade_url();
 			$lti_consumer_key = $lti->lti_consumer_key();
 			$result_sourcedid = $lti->result_sourcedid();
 			$role = $lti->user_roles();
 
-			if(($role !== "Instructor") || ($role !== "Administrator")){
-				$calldata = '';
+			if(($role === "Instructor") || ($role === "Administrator")){
+				$calldata = $lti->calldata();
 			}
 
             
