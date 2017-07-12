@@ -185,6 +185,15 @@ export default class Container extends React.Component {
 
     render(){
 
+
+        let calldata = (<div className="call-data-container">
+            <hr/>
+            <h3>Following is visible to instructors only</h3>
+            <pre>
+                {JSON.stringify($LTI_call_data)}
+            </pre>
+        </div>)
+
         const questions = this.structure.map(question=>{
            const sliders = question.sliders.map(slider=>{
 
@@ -235,8 +244,11 @@ export default class Container extends React.Component {
 
         return (
         <div className="container-component clearfix">
-            {questions}
-            {submit_button}
+            <div className="clearfix">
+                {questions}
+                {submit_button}
+            </div>
+            {calldata}
         </div>);
     }
 }

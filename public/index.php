@@ -27,17 +27,13 @@
 			$lti_grade_url = $lti->grade_url();
 			$lti_consumer_key = $lti->lti_consumer_key();
 			$result_sourcedid = $lti->result_sourcedid();
+			$role = $lti->user_roles();
 
-            $custom_variable_by_user_string = "woah";
-			if(isset($calldata{'custom_variable_by_user_string'})){
-				$custom_variable_by_user_string = $calldata{'custom_variable_by_user_string'};
+			if($role != "Instructor"){
+				$calldata = '';
 			}
 
-            $custom_variable_by_user_bool = "false";
-			if(isset($calldata{'custom_variable_by_user_bool'})){
-				$custom_variable_by_user_bool = json_decode($calldata{'custom_variable_by_user_bool'});
-			}
-            //echo $custom_variable_by_user_string;
+            
         ?>
     </head>
     <body>
@@ -48,9 +44,9 @@
 		$LTI_grade_url = '<?php echo $lti_grade_url ?>';
 		$LTI_consumer_key = '<?php echo $lti_consumer_key ?>';
 		$LTI_result_sourcedid = '<?php echo $result_sourcedid ?>';
+		$LTI_user_role = '<?php echo $role ?>';
+		$LTI_call_data = JSON.parse('<?php echo json_encode($calldata) ?>');
 
-		$LTI_custom_variable_by_user_string = '<?php echo $custom_variable_by_user_string ?>';
-		$LTI_custom_variable_by_user_bool = JSON.parse('<?php echo json_encode($custom_variable_by_user_bool) ?>');
         $LTI_is_valid = JSON.parse('<?php echo json_encode($lti->is_valid()) ?>'); 
 	</script>
     <div id="app"></div>
