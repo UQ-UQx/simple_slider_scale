@@ -29,7 +29,7 @@
 			$result_sourcedid = $lti->result_sourcedid();
 			$role = $lti->user_roles();
 
-			if($role != "Instructor"){
+			if(($role !== "Instructor") || ($role !== "Administrator")){
 				$calldata = '';
 			}
 

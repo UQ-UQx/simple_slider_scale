@@ -194,7 +194,7 @@ export default class Container extends React.Component {
             </pre>
         </div>)
 
-        if($LTI_user_role != "Instructor"){
+        if(($LTI_user_role !== "Instructor") || ($LTI_user_role !== "Administrator")){
             calldata = "";
         }
 
